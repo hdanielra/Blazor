@@ -1,0 +1,68 @@
+﻿@page "/filmdetails"
+@page "/filmdetails/{id:int}"
+@using Model
+@using Interfaces
+@inject IFilmService filmService
+@inject NavigationManager navigationManager
+
+
+<h1>Film Details</h1>
+
+<EditForm Model="@film">
+
+    <table>
+        <tr>
+            <td>Title:</td>
+            <td><input type="text" @bind="film.Title" /></td>
+        </tr>
+        <tr>
+            <td>Director:</td>
+            <td><input type="text" @bind="film.Director" /></td>
+        </tr>
+        <tr>
+            <td>Release Date:</td>
+            <td><input type="text" @bind="film.ReleaseDate" /></td>
+        </tr>
+        <tr>
+            <td colspan="1" style="text-align:center">
+                <input type="submit" value="Save" @onclick="SaveFilm" />
+                <input type="button" value="Cancel" @onclick="CancelFilm" />
+            </td>
+        </tr>
+    </table>
+
+</EditForm>
+
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Film film = new Film();
+
+    protected void CancelFilm()
+    {
+        navigationManager.NavigateTo("/FilmList");
+    }
+
+
+    protected async Task SaveFilm()
+    {
+        await filmService.SaveFilm(film);
+        navigationManager.NavigateTo("/FilmList");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id == 0)
+        {
+            film.ReleaseDate = DateTime.Now;
+        }
+        else
+        {
+            film = await filmService.GetDetails(id);
+        }
+    }
+}
